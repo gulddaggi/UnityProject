@@ -8,8 +8,14 @@ public class PlayerController : MonoBehaviour
     //이동
     [SerializeField]
     private float walkSpeed;
+    [SerializeField]
+    private float runSpeed;
+
+    private float currentSpeed;
 
     private Rigidbody playerRigid;
+
+    private bool isRun = false;
 
     //회전
     [SerializeField]
@@ -26,6 +32,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         playerRigid = GetComponent<Rigidbody>();
+        currentSpeed = walkSpeed;
     }
 
 
@@ -38,8 +45,10 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         Move();
+        Run();
     }
 
+    //이동
     private void Move()
     {
         float _moveX = Input.GetAxisRaw("Horizontal");
@@ -49,11 +58,12 @@ public class PlayerController : MonoBehaviour
         Vector3 _moveHorizontal = transform.right * _moveX;
         Vector3 _moveVertical = transform.forward * _moveZ;
 
-        Vector3 _moveDir = (_moveHorizontal + _moveVertical).normalized * walkSpeed;
+        Vector3 _moveDir = (_moveHorizontal + _moveVertical).normalized * currentSpeed;
 
         playerRigid.MovePosition(transform.position + _moveDir * Time.deltaTime);
     }
 
+    //Y축 회전
     private void RotationY()
     {
         float _rotationX = Input.GetAxisRaw("Mouse Y");
@@ -64,11 +74,27 @@ public class PlayerController : MonoBehaviour
         
     }
 
+    //X축 회전
     private void RotationX()
     {
         float _rotationY = Input.GetAxisRaw("Mouse X");
         Vector3 _characterRotationY = new Vector3(0f, _rotationY, 0f) * rotationSpeed;
         playerRigid.MoveRotation(playerRigid.rotation * Quaternion.Euler(_characterRotationY));
+    }
+
+    //달리기
+    private void Run()
+    {
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            isRun = true;
+            currentSpeed = runSpeed;
+        }
+        if (Input.GetKeyUp(KeyCode.LeftShift))
+        {
+            isRun = false;
+            currentSpeed = walkSpeed;
+        }
     }
 
 }
